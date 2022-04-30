@@ -6,7 +6,7 @@ import getSocket, { Client } from './get-socket';
 ipc.config.silent = true;
 let socketClient: Client | null = null;
 let replyHandlers = new Map();
-let initialized: Promise<Client | undefined> | null = null;
+let initialized: Promise<Client | null> | null = null;
 
 process.on('unhandledRejection', function (error, promise) {
   console.log(error);
@@ -29,11 +29,13 @@ export function send<T = unknown>(name: string, args?: any | any[]) {
   });
 }
 
-export async function init(socketName?: string): Promise<Client> {
+export async function init(socketName?: string): Promise<void> {
   // Support calling this multiple times before it actually connects
   if (initialized) {
-    return initialized;
+    await initialized;
+    return;
   }
+
   initialized = getSocket(socketName);
   socketClient = await initialized;
 

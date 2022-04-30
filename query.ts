@@ -6,8 +6,8 @@ export type QueryState = {
   calculation: boolean;
   rawMode: boolean;
   withDead: boolean;
-  limit: number;
-  offset: number;
+  limit: number | null;
+  offset: number | null;
   table: any;
   tableOptions?: any;
 };
