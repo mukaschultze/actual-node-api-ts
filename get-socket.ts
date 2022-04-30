@@ -1,7 +1,4 @@
-const net = require('net');
-const os = require('os');
-const { join } = require('path');
-const ipc = require('node-ipc');
+import ipc from 'node-ipc';
 
 function connect(name) {
   return new Promise((resolve, reject) => {
@@ -18,7 +15,7 @@ function connect(name) {
   });
 }
 
-async function getSocket(name) {
+export default async function getSocket(name) {
   if (name) {
     return connect(name);
   }
@@ -35,5 +32,3 @@ async function getSocket(name) {
 
   return client;
 }
-
-module.exports = getSocket;

@@ -1,6 +1,6 @@
-let ipc = require('node-ipc');
-let uuid = require('uuid');
-let getSocket = require('./get-socket');
+import ipc from 'node-ipc';
+import uuid from 'uuid';
+import getSocket from './get-socket';
 
 process.traceProcessWarnings = true;
 ipc.config.silent = true;
@@ -8,18 +8,18 @@ let socketClient = null;
 let replyHandlers = new Map();
 let initialized = null;
 
-process.on('unhandledRejection', function(error, promise) {
+process.on('unhandledRejection', function (error, promise) {
   console.log(error);
 });
 
-function send(name, args) {
+export function send(name, args) {
   return new Promise((resolve, reject) => {
     let id = uuid.v4();
     replyHandlers.set(id, { resolve, reject });
     if (socketClient) {
       socketClient.emit('message', JSON.stringify({ id, name, args }));
     }
-  }).catch(err => {
+  }).catch((err) => {
     if (typeof err === 'string' && err.includes('API Error')) {
       // Throwing the error here captures the correct async stack trace.
       // If we just let the promise reject
@@ -29,7 +29,7 @@ function send(name, args) {
   });
 }
 
-async function init(socketName) {
+export async function init(socketName) {
   // Support calling this multiple times before it actually connects
   if (initialized) {
     return initialized;
@@ -44,7 +44,7 @@ async function init(socketName) {
     throw new Error("Couldn't connect to Actual. Please run the app first.");
   }
 
-  socketClient.on('message', data => {
+  socketClient.on('message', (data) => {
     const msg = JSON.parse(data);
 
     if (msg.type === 'error') {
@@ -75,7 +75,7 @@ async function init(socketName) {
   });
 }
 
-function disconnect() {
+export function disconnect() {
   if (socketClient) {
     ipc.disconnect(socketClient.id);
     socketClient = null;
@@ -100,19 +100,17 @@ async function _run(func) {
   return res;
 }
 
-async function runWithBudget(id, func) {
+export async function runWithBudget(id, func) {
   return _run(async () => {
     await send('api/load-budget', { id });
     return func();
   });
 }
 
-async function runImport(name, func) {
+export async function runImport(name, func) {
   return _run(async () => {
     await send('api/start-import', { budgetName: name });
     await func();
     await send('api/finish-import');
   });
 }
-
-module.exports = { init, send, disconnect, runWithBudget, runImport };

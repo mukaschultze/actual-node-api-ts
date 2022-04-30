@@ -1,4 +1,4 @@
-class Query {
+export class Query {
   constructor(state) {
     this.state = {
       filterExpressions: state.filterExpressions || [],
@@ -10,14 +10,14 @@ class Query {
       withDead: false,
       limit: null,
       offset: null,
-      ...state
+      ...state,
     };
   }
 
   filter(expr) {
     return new Query({
       ...this.state,
-      filterExpressions: [...this.state.filterExpressions, expr]
+      filterExpressions: [...this.state.filterExpressions, expr],
     });
   }
 
@@ -26,8 +26,8 @@ class Query {
     return new Query({
       ...this.state,
       filterExpressions: this.state.filterExpressions.filter(
-        expr => !exprSet.has(Object.keys(expr)[0])
-      )
+        (expr) => !exprSet.has(Object.keys(expr)[0])
+      ),
     });
   }
 
@@ -54,7 +54,7 @@ class Query {
 
     return new Query({
       ...this.state,
-      groupExpressions: [...this.state.groupExpressions, ...exprs]
+      groupExpressions: [...this.state.groupExpressions, ...exprs],
     });
   }
 
@@ -65,7 +65,7 @@ class Query {
 
     return new Query({
       ...this.state,
-      orderExpressions: [...this.state.orderExpressions, ...exprs]
+      orderExpressions: [...this.state.orderExpressions, ...exprs],
     });
   }
 
@@ -94,6 +94,6 @@ class Query {
   }
 }
 
-module.exports = function q(table) {
+export default function q(table) {
   return new Query({ table });
 }
