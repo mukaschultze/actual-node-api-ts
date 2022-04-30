@@ -1,19 +1,19 @@
 import ipc from 'node-ipc';
 import uuid from 'uuid';
-import getSocket from './get-socket';
+import getSocket, { Client } from './get-socket';
 
-process.traceProcessWarnings = true;
+// process.traceProcessWarnings = true;
 ipc.config.silent = true;
-let socketClient = null;
+let socketClient: Client | null = null;
 let replyHandlers = new Map();
-let initialized = null;
+let initialized: Promise<Client | undefined> | null = null;
 
 process.on('unhandledRejection', function (error, promise) {
   console.log(error);
 });
 
-export function send(name, args) {
-  return new Promise((resolve, reject) => {
+export function send<T = unknown>(name: string, args?: any | any[]) {
+  return new Promise<T>((resolve, reject) => {
     let id = uuid.v4();
     replyHandlers.set(id, { resolve, reject });
     if (socketClient) {
@@ -29,7 +29,7 @@ export function send(name, args) {
   });
 }
 
-export async function init(socketName) {
+export async function init(socketName?: string): Promise<Client> {
   // Support calling this multiple times before it actually connects
   if (initialized) {
     return initialized;
@@ -79,11 +79,11 @@ export function disconnect() {
   if (socketClient) {
     ipc.disconnect(socketClient.id);
     socketClient = null;
-    initialized = false;
+    initialized = null;
   }
 }
 
-async function _run(func) {
+async function _run<T>(func: () => T) {
   let res;
 
   try {
@@ -100,14 +100,14 @@ async function _run(func) {
   return res;
 }
 
-export async function runWithBudget(id, func) {
+export async function runWithBudget<T = unknown>(id: any, func: () => T) {
   return _run(async () => {
     await send('api/load-budget', { id });
     return func();
   });
 }
 
-export async function runImport(name, func) {
+export async function runImport<T = unknown>(name: any, func: () => T) {
   return _run(async () => {
     await send('api/start-import', { budgetName: name });
     await func();

@@ -1,11 +1,13 @@
 import ipc from 'node-ipc';
 
-function connect(name) {
-  return new Promise((resolve, reject) => {
+export type Client = typeof ipc['of'][string] & { id?: string };
+
+function connect(name: string) {
+  return new Promise<Client | undefined>((resolve, reject) => {
     ipc.connectTo(name, () => {
       ipc.of[name].on('error', () => {
         ipc.disconnect(name);
-        resolve(false);
+        resolve(undefined);
       });
 
       ipc.of[name].on('connect', () => {
@@ -15,7 +17,9 @@ function connect(name) {
   });
 }
 
-export default async function getSocket(name) {
+export default async function getSocket(
+  name: string
+): Promise<Client | undefined> {
   if (name) {
     return connect(name);
   }

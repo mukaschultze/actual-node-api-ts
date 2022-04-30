@@ -1,5 +1,21 @@
+export type QueryState = {
+  filterExpressions: any[];
+  selectExpressions: any[];
+  groupExpressions: any[];
+  orderExpressions: any[];
+  calculation: boolean;
+  rawMode: boolean;
+  withDead: boolean;
+  limit: number;
+  offset: number;
+  table: any;
+  tableOptions?: any;
+};
+
 export class Query {
-  constructor(state) {
+  private state: QueryState;
+
+  constructor(state: Partial<QueryState> & Pick<QueryState, 'table'>) {
     this.state = {
       filterExpressions: state.filterExpressions || [],
       selectExpressions: state.selectExpressions || [],
@@ -14,14 +30,14 @@ export class Query {
     };
   }
 
-  filter(expr) {
+  filter(expr: QueryState['filterExpressions'][number]) {
     return new Query({
       ...this.state,
       filterExpressions: [...this.state.filterExpressions, expr],
     });
   }
 
-  unfilter(exprs) {
+  unfilter(exprs: QueryState['filterExpressions']) {
     let exprSet = new Set(exprs);
     return new Query({
       ...this.state,
@@ -31,7 +47,7 @@ export class Query {
     });
   }
 
-  select(exprs = []) {
+  select(exprs: any = []) {
     if (!Array.isArray(exprs)) {
       exprs = [exprs];
     }
@@ -41,13 +57,13 @@ export class Query {
     return query;
   }
 
-  calculate(expr) {
+  calculate(expr: any) {
     let query = this.select({ result: expr });
     query.state.calculation = true;
     return query;
   }
 
-  groupBy(exprs) {
+  groupBy(exprs: any | any[]) {
     if (!Array.isArray(exprs)) {
       exprs = [exprs];
     }
@@ -58,7 +74,7 @@ export class Query {
     });
   }
 
-  orderBy(exprs) {
+  orderBy(exprs: any | any[]) {
     if (!Array.isArray(exprs)) {
       exprs = [exprs];
     }
@@ -69,11 +85,11 @@ export class Query {
     });
   }
 
-  limit(num) {
+  limit(num: number) {
     return new Query({ ...this.state, limit: num });
   }
 
-  offset(num) {
+  offset(num: number) {
     return new Query({ ...this.state, offset: num });
   }
 
@@ -85,7 +101,7 @@ export class Query {
     return new Query({ ...this.state, withDead: true });
   }
 
-  options(opts) {
+  options(opts: QueryState['tableOptions']) {
     return new Query({ ...this.state, tableOptions: opts });
   }
 
@@ -94,6 +110,6 @@ export class Query {
   }
 }
 
-export default function q(table) {
+export default function q(table: QueryState['table']) {
   return new Query({ table });
 }
