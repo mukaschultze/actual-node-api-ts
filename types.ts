@@ -1,6 +1,12 @@
+/** UUID */
 export type id = string;
-export type date = string;
+/** YYYY-MM */
 export type month = string;
+/** YYYY-MM-DD */
+export type date = string;
+/** A currency amount is an integer representing the value without any decimal
+ * places. Usually it's value * 100, but it depends on your currency. For
+ * example, a USD amount of $120.30 would be 12030. */
 export type amount = number;
 
 export type Budget = unknown;
@@ -12,21 +18,25 @@ export interface Transaction {
   amount?: amount;
   /** In a create request, this overrides payee_name. */
   payee?: id;
-  /** If given, a payee will be created with this name. If this matches an already existing payee, it will use it.
-  /** * Only available in a create request */
+  /** If given, a payee will be created with this name. If this matches an
+  already existing payee, it will use it. /** * Only available in a create
+  request */
   payee_name?: string;
-  /** This can be anything. Meant to represent the raw description when importing, allowing the user to see the original value. */
+  /** This can be anything. Meant to represent the raw description when
+   * importing, allowing the user to see the original value. */
   imported_payee?: string;
   category?: id;
   notes?: string;
-  /** A unique id usually given by the bank, if importing. Use this is avoid duplicate transactions. */
+  /** A unique id usually given by the bank, if importing. Use this is avoid
+   * duplicate transactions. */
   imported_id?: string;
-  /** If a transfer, the id of the transaction in the other account for the transfer. See transfers. */
+  /** If a transfer, the id of the transaction in the other account for the
+   * transfer. */
   transfer_id?: string;
   /** A flag indicating if the transaction has cleared or not. */
   cleared?: boolean;
-  /** An array of subtransactions for a split transaction. See split transactions.
-  /** * Only available in a get or create request */
+  /** An array of subtransactions for a split transaction.
+   * * Only available in a get or create request */
   subtransactions?: Transaction[];
 }
 
@@ -63,7 +73,8 @@ export interface CategoryGroup {
   name: string;
   /** Defaults to false */
   is_income?: boolean;
-  /** An array of categories in this group. Not valid when creating or updating a category group
+  /** An array of categories in this group. Not valid when creating or updating
+   * a category group
    * * Only available in a get. */
   categories?: Category[];
 }
@@ -72,7 +83,8 @@ export interface Payee {
   id?: id;
   name: string;
   category?: id;
-  /** The id of the account this payee transfers to/from, if this is a transfer payee. */
+  /** The id of the account this payee transfers to/from, if this is a transfer
+   * payee. */
   transfer_acct?: id;
 }
 

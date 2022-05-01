@@ -102,6 +102,8 @@ async function _run<T>(func: () => T) {
   return res;
 }
 
+/** After connecting to the budget budgetId, run the function. This function can
+ * assume all API methods are ready to use. */
 export async function runWithBudget<T = unknown>(id: any, func: () => T) {
   return _run(async () => {
     await send('api/load-budget', { id });
@@ -109,6 +111,9 @@ export async function runWithBudget<T = unknown>(id: any, func: () => T) {
   });
 }
 
+/** Create the budget budgetName, connect to it, and run the function. This puts
+ * the API in a special "import mode" that does some maintenance work to create
+ * a new budget, and bulk importing data runs much faster. */
 export async function runImport<T = unknown>(name: any, func: () => T) {
   return _run(async () => {
     await send('api/start-import', { budgetName: name });
